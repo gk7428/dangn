@@ -39,8 +39,8 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (Platform.OS === 'android') {
-      WebBrowser.warmUpAsync();
-      return () => { WebBrowser.coolDownAsync(); };
+      WebBrowser.warmUpAsync().catch(() => {});
+      return () => { WebBrowser.coolDownAsync().catch(() => {}); };
     }
   }, []);
 

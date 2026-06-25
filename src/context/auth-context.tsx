@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session } from '@supabase/supabase-js';
 import * as WebBrowser from 'expo-web-browser';
-import { makeRedirectUri } from 'expo-auth-session';
 import { supabase } from '@/lib/supabase';
 
 type Profile = {
@@ -89,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signInWithKakao(): Promise<string | null> {
     try {
+      const { makeRedirectUri } = await import('expo-auth-session');
       const redirectUri = makeRedirectUri({ scheme: 'dangn' });
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'kakao',
