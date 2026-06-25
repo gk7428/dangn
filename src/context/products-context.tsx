@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useAuth } from '@/context/auth-context';
 import { Product } from '@/data/products';
 
@@ -65,16 +65,24 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
   }, [account?.tier, account?.role]);
 
   async function fetchProducts() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      setProducts((data as DbRow[]).map(rowToProduct));
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data) {
+        setProducts((data as DbRow[]).map(rowToProduct));
+      }
+    } catch {
+      // 네트워크 에러 시 빈 목록 유지
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function addProduct(product: Product) {
