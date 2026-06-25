@@ -1,8 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import { FlatList, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from 'react';
 
 import { ThemedText } from '@/components/themed-text';
+
+const CORAL = '#FF5A4D';
+const CORAL_PRESS = '#E8463A';
+const CORAL_SOFT = '#FFF0EC';
+const BG = '#F6F3EE';
+const INK = '#2A2723';
+const INK2 = '#6E675F';
+const INK3 = '#A49C92';
+const LINE = '#F0EBE3';
+const LINE2 = '#E4DCD1';
 
 type Post = {
   id: string;
@@ -99,11 +110,11 @@ function PostItem({ item }: { item: Post }) {
         <ThemedText style={styles.postLocation}>{item.location} · {item.timeAgo}</ThemedText>
         <View style={styles.postStats}>
           <View style={styles.statItem}>
-            <Ionicons name="chatbubble-outline" size={13} color="#888" />
+            <Ionicons name="chatbubble-outline" size={13} color={INK3} />
             <ThemedText style={styles.statText}>{item.comments}</ThemedText>
           </View>
           <View style={styles.statItem}>
-            <Ionicons name="heart-outline" size={13} color="#888" />
+            <Ionicons name="heart-outline" size={13} color={INK3} />
             <ThemedText style={styles.statText}>{item.likes}</ThemedText>
           </View>
         </View>
@@ -113,19 +124,21 @@ function PostItem({ item }: { item: Post }) {
 }
 
 export default function CommunityScreen() {
+  const [selectedCat, setSelectedCat] = useState('전체');
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationButton} activeOpacity={0.7}>
           <ThemedText style={styles.headerTitle}>서울시 마포구</ThemedText>
-          <Ionicons name="chevron-down" size={18} color="#000" />
+          <Ionicons name="chevron-down" size={18} color={INK} />
         </TouchableOpacity>
         <View style={styles.headerIcons}>
           <TouchableOpacity activeOpacity={0.7}>
-            <Ionicons name="search" size={24} color="#000" />
+            <Ionicons name="search" size={24} color={INK} />
           </TouchableOpacity>
           <TouchableOpacity activeOpacity={0.7}>
-            <Ionicons name="create-outline" size={24} color="#000" />
+            <Ionicons name="create-outline" size={24} color={INK} />
           </TouchableOpacity>
         </View>
       </View>
@@ -134,32 +147,37 @@ export default function CommunityScreen() {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.categoryScroll}>
-        {CATEGORIES.map((cat) => (
-          <TouchableOpacity key={cat} style={styles.categoryChip} activeOpacity={0.7}>
-            <ThemedText style={styles.categoryChipText}>{cat}</ThemedText>
-          </TouchableOpacity>
-        ))}
+        {CATEGORIES.map((cat) => {
+          const active = cat === selectedCat;
+          return (
+            <TouchableOpacity
+              key={cat}
+              style={[styles.categoryChip, active && styles.categoryChipActive]}
+              activeOpacity={0.7}
+              onPress={() => setSelectedCat(cat)}>
+              <ThemedText style={[styles.categoryChipText, active && styles.categoryChipTextActive]}>
+                {cat}
+              </ThemedText>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
       <View style={styles.divider} />
 
       <FlatList
-        data={POSTS}
+        data={selectedCat === '전체' ? POSTS : POSTS.filter((p) => p.category === selectedCat)}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <PostItem item={item} />}
         ItemSeparatorComponent={() => <View style={styles.divider} />}
         contentContainerStyle={styles.list}
       />
-
-      <TouchableOpacity style={styles.fab} activeOpacity={0.85}>
-        <Ionicons name="create-outline" size={24} color="#fff" />
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: BG },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -167,10 +185,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E8E8',
+    borderBottomColor: LINE2,
+    backgroundColor: BG,
   },
   locationButton: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  headerTitle: { fontSize: 17, fontWeight: '700', color: '#000' },
+  headerTitle: { fontSize: 17, fontWeight: '700', color: INK },
   headerIcons: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   categoryScroll: { paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
   categoryChip: {
@@ -178,46 +197,35 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#fff',
+    borderColor: LINE2,
+    backgroundColor: '#FFFFFF',
   },
-  categoryChipText: { fontSize: 14, color: '#1A1A1A' },
-  divider: { height: 1, backgroundColor: '#F0F0F0' },
-  list: { paddingBottom: 100 },
-  postItem: { paddingHorizontal: 16, paddingVertical: 16, gap: 6 },
+  categoryChipActive: {
+    borderColor: CORAL,
+    backgroundColor: CORAL_SOFT,
+  },
+  categoryChipText: { fontSize: 14, color: INK2 },
+  categoryChipTextActive: { color: CORAL_PRESS, fontWeight: '700' },
+  divider: { height: 1, backgroundColor: LINE },
+  list: { paddingBottom: 24 },
+  postItem: { paddingHorizontal: 16, paddingVertical: 16, gap: 6, backgroundColor: '#FFFFFF' },
   categoryBadge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
   },
-  categoryBadgeText: { fontSize: 12, color: '#555', fontWeight: '500' },
-  postTitle: { fontSize: 15, fontWeight: '600', color: '#1A1A1A', lineHeight: 21 },
-  postPreview: { fontSize: 14, color: '#666', lineHeight: 20 },
+  categoryBadgeText: { fontSize: 12, color: INK2, fontWeight: '500' },
+  postTitle: { fontSize: 15, fontWeight: '600', color: INK, lineHeight: 21 },
+  postPreview: { fontSize: 14, color: INK2, lineHeight: 20 },
   postMeta: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 2,
   },
-  postLocation: { fontSize: 12, color: '#AAA' },
+  postLocation: { fontSize: 12, color: INK3 },
   postStats: { flexDirection: 'row', gap: 10 },
   statItem: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  statText: { fontSize: 12, color: '#888' },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 80,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#FF6F0F',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
+  statText: { fontSize: 12, color: INK3 },
 });

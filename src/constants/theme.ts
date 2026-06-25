@@ -63,3 +63,16 @@ export const Spacing = {
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
+
+export const CORAL = '#FF5A4D';
+export const CORAL_PRESS = '#E8463A';
+export const CORAL_SOFT = '#FFF0EC';
+export const CORAL_SOFT2 = '#FFE0D8';
+export const BG = '#F6F3EE';
+export const SURFACE = '#FFFFFF';
+export const INK = '#2A2723';
+export const INK2 = '#6E675F';
+export const INK3 = '#A49C92';
+export const LINE = '#F0EBE3';
+export const LINE2 = '#E4DCD1';
+export const OK = '#2FA86A';

@@ -6,6 +6,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { useProducts } from '@/context/products-context';
 
+const CORAL = '#FF5A4D';
+const INK = '#2A2723';
+const INK2 = '#6E675F';
+const INK3 = '#A49C92';
+const LINE = '#F0EBE3';
+const LINE2 = '#E4DCD1';
+
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { products } = useProducts();
@@ -23,17 +30,17 @@ export default function ProductDetailScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={26} color="#1A1A1A" />
+          <Ionicons name="chevron-back" size={26} color={INK} />
         </TouchableOpacity>
         <View style={styles.headerRight}>
           <TouchableOpacity activeOpacity={0.7}>
-            <Ionicons name="heart-outline" size={24} color="#1A1A1A" />
+            <Ionicons name="heart-outline" size={24} color={INK} />
           </TouchableOpacity>
           <TouchableOpacity activeOpacity={0.7}>
-            <Ionicons name="share-outline" size={24} color="#1A1A1A" />
+            <Ionicons name="share-outline" size={24} color={INK} />
           </TouchableOpacity>
           <TouchableOpacity activeOpacity={0.7}>
-            <Ionicons name="ellipsis-vertical" size={24} color="#1A1A1A" />
+            <Ionicons name="ellipsis-vertical" size={24} color={INK} />
           </TouchableOpacity>
         </View>
       </View>
@@ -65,7 +72,7 @@ export default function ProductDetailScreen() {
 
       <View style={styles.footer}>
         <TouchableOpacity activeOpacity={0.7} style={styles.likeButton}>
-          <Ionicons name="heart-outline" size={24} color="#1A1A1A" />
+          <Ionicons name="heart-outline" size={24} color={INK} />
           <ThemedText style={styles.footerPrice}>{product.price}</ThemedText>
         </TouchableOpacity>
         <TouchableOpacity style={styles.chatButton} activeOpacity={0.8}>
@@ -79,7 +86,7 @@ export default function ProductDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
@@ -88,7 +95,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E8E8',
+    borderBottomColor: LINE2,
   },
   backButton: {
     padding: 8,
@@ -115,21 +122,21 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#D0D0D0',
+    backgroundColor: '#D0CCC8',
   },
   sellerName: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: INK,
   },
   sellerLocation: {
     fontSize: 13,
-    color: '#888',
+    color: INK2,
     marginTop: 2,
   },
   divider: {
     height: 1,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: LINE,
     marginHorizontal: 16,
   },
   body: {
@@ -140,22 +147,22 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: INK,
     lineHeight: 26,
   },
   meta: {
     fontSize: 13,
-    color: '#888',
+    color: INK2,
   },
   description: {
     fontSize: 15,
-    color: '#333',
+    color: INK2,
     lineHeight: 22,
     marginTop: 8,
   },
   statsText: {
     fontSize: 13,
-    color: '#AAA',
+    color: INK3,
     marginTop: 8,
   },
   footer: {
@@ -164,25 +171,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E8E8E8',
+    borderTopColor: LINE2,
     gap: 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   likeButton: {
     alignItems: 'center',
     gap: 4,
     paddingRight: 12,
     borderRightWidth: 1,
-    borderRightColor: '#E0E0E0',
+    borderRightColor: LINE2,
   },
   footerPrice: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: INK,
   },
   chatButton: {
     flex: 1,
-    backgroundColor: '#FF6F0F',
+    backgroundColor: CORAL,
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',

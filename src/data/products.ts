@@ -8,6 +8,7 @@ export type Product = {
   color: string;
   description: string;
   photoUri?: string;
+  requiredTier?: 'free' | 'paid';
 };
 
 export const PRODUCTS: Product[] = [

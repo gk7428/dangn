@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   Modal,
@@ -16,6 +17,15 @@ import { ThemedText } from '@/components/themed-text';
 import { useProducts } from '@/context/products-context';
 import { Product } from '@/data/products';
 import { formatDistrict, searchDistricts } from '@/data/districts';
+
+const CORAL = '#FF5A4D';
+const CORAL_PRESS = '#E8463A';
+const BG = '#F6F3EE';
+const INK = '#2A2723';
+const INK2 = '#6E675F';
+const INK3 = '#A49C92';
+const LINE = '#F0EBE3';
+const LINE2 = '#E4DCD1';
 
 function ProductItem({ item }: { item: Product }) {
   return (
@@ -34,7 +44,7 @@ function ProductItem({ item }: { item: Product }) {
         <View style={styles.priceRow}>
           <ThemedText style={styles.price}>{item.price}</ThemedText>
           <View style={styles.likesRow}>
-            <Ionicons name="heart-outline" size={14} color="#888" />
+            <Ionicons name="heart-outline" size={14} color={INK3} />
             <ThemedText style={styles.likes}>{item.likes}</ThemedText>
           </View>
         </View>
@@ -48,7 +58,7 @@ function Separator() {
 }
 
 export default function HomeScreen() {
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
   const [location, setLocation] = useState('서울특별시 마포구');
   const [showLocationSearch, setShowLocationSearch] = useState(false);
   const [locationQuery, setLocationQuery] = useState('');
@@ -70,35 +80,34 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationButton} activeOpacity={0.7} onPress={openLocationSearch}>
           <ThemedText style={styles.locationText}>{formatDistrict(location)}</ThemedText>
-          <Ionicons name="chevron-down" size={18} color="#000" />
+          <Ionicons name="chevron-down" size={18} color={INK} />
         </TouchableOpacity>
         <View style={styles.headerIcons}>
           <TouchableOpacity activeOpacity={0.7}>
-            <Ionicons name="search" size={24} color="#000" />
+            <Ionicons name="search" size={24} color={INK} />
           </TouchableOpacity>
           <TouchableOpacity activeOpacity={0.7}>
-            <Ionicons name="notifications-outline" size={24} color="#000" />
+            <Ionicons name="notifications-outline" size={24} color={INK} />
           </TouchableOpacity>
           <TouchableOpacity activeOpacity={0.7}>
-            <Ionicons name="chatbubble-ellipses-outline" size={24} color="#000" />
+            <Ionicons name="chatbubble-ellipses-outline" size={24} color={INK} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <FlatList
-        data={products}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <ProductItem item={item} />}
-        ItemSeparatorComponent={Separator}
-        contentContainerStyle={styles.list}
-      />
-
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => router.push('/sell')}
-        activeOpacity={0.85}>
-        <Ionicons name="add" size={28} color="#fff" />
-      </TouchableOpacity>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={CORAL} />
+        </View>
+      ) : (
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <ProductItem item={item} />}
+          ItemSeparatorComponent={Separator}
+          contentContainerStyle={styles.list}
+        />
+      )}
 
       {/* 동네 검색 모달 */}
       <Modal
@@ -116,16 +125,16 @@ export default function HomeScreen() {
             <View style={styles.sheetHeader}>
               <ThemedText style={styles.sheetTitle}>내 동네 설정</ThemedText>
               <TouchableOpacity onPress={() => setShowLocationSearch(false)} activeOpacity={0.7}>
-                <Ionicons name="close" size={22} color="#1A1A1A" />
+                <Ionicons name="close" size={22} color={INK} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.searchBox}>
-              <Ionicons name="search" size={18} color="#ABABAB" style={styles.searchIcon} />
+              <Ionicons name="search" size={18} color={INK3} style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="동/읍/면/구를 검색하세요"
-                placeholderTextColor="#ABABAB"
+                placeholderTextColor={INK3}
                 value={locationQuery}
                 onChangeText={setLocationQuery}
                 autoFocus
@@ -148,7 +157,7 @@ export default function HomeScreen() {
                     <ThemedText style={[styles.districtText, selected && styles.districtSelected]}>
                       {formatDistrict(item)}
                     </ThemedText>
-                    {selected && <Ionicons name="checkmark" size={18} color="#FF6F0F" />}
+                    {selected && <Ionicons name="checkmark" size={18} color={CORAL} />}
                   </TouchableOpacity>
                 );
               }}
@@ -164,7 +173,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BG,
   },
   header: {
     flexDirection: 'row',
@@ -173,8 +182,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E8E8',
-    backgroundColor: '#fff',
+    borderBottomColor: LINE2,
+    backgroundColor: BG,
   },
   locationButton: {
     flexDirection: 'row',
@@ -184,7 +193,7 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#000',
+    color: INK,
   },
   headerIcons: {
     flexDirection: 'row',
@@ -199,6 +208,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     gap: 12,
+    backgroundColor: '#FFFFFF',
   },
   thumbnail: {
     width: 110,
@@ -213,12 +223,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
-    color: '#1A1A1A',
+    color: INK,
     lineHeight: 20,
   },
   meta: {
     fontSize: 13,
-    color: '#888',
+    color: INK2,
   },
   priceRow: {
     flexDirection: 'row',
@@ -229,7 +239,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: INK,
   },
   likesRow: {
     flexDirection: 'row',
@@ -238,28 +248,12 @@ const styles = StyleSheet.create({
   },
   likes: {
     fontSize: 13,
-    color: '#888',
+    color: INK3,
   },
   separator: {
     height: 1,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: LINE,
     marginHorizontal: 16,
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 80,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#FF6F0F',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
   },
   // 모달
   modalOverlay: {
@@ -268,7 +262,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   bottomSheet: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     maxHeight: '80%',
@@ -280,7 +274,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
-  sheetTitle: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
+  sheetTitle: { fontSize: 16, fontWeight: '700', color: INK },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -288,17 +282,17 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: LINE,
     borderRadius: 10,
   },
   searchIcon: { marginRight: 8 },
   searchInput: {
     flex: 1,
     fontSize: 15,
-    color: '#1A1A1A',
+    color: INK,
     padding: 0,
   },
-  sheetDivider: { height: 1, backgroundColor: '#F0F0F0' },
+  sheetDivider: { height: 1, backgroundColor: LINE },
   districtItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -306,6 +300,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
   },
-  districtText: { fontSize: 16, color: '#1A1A1A' },
-  districtSelected: { color: '#FF6F0F', fontWeight: '600' },
+  districtText: { fontSize: 16, color: INK },
+  districtSelected: { color: CORAL_PRESS, fontWeight: '600' },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 80,
+  },
 });
