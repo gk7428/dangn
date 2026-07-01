@@ -90,7 +90,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut(): Promise<void> {
-    await supabase.auth.signOut();
+    try {
+      // scope: 'local' — 기기의 세션만 제거한다. global 스코프는 서버 폐기 요청이
+      // 실패(카카오 OAuth 토큰 만료 등)하면 예외를 던져 로그아웃이 막힐 수 있다.
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch {
+      // 세션 폐기 요청 실패는 무시하고 로컬 상태를 강제로 정리한다.
+    } finally {
+      setSession(null);
+      setProfile(null);
+      setAccount(null);
+    }
   }
 
   async function signInWithKakao(): Promise<string | null> {
