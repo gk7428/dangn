@@ -42,6 +42,9 @@ export const supabase = createClient(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: false,
+      // OAuth(카카오) 콜백에서 exchangeCodeForSession을 쓰려면 PKCE 플로우가 필요하다.
+      // 기본값 'implicit'에서는 code verifier가 생성되지 않아 코드 교환이 실패한다.
+      flowType: 'pkce',
     },
   }
 );

@@ -114,7 +114,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error || !data.url) return error?.message ?? '카카오 로그인 실패';
       const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUri);
       if (result.type !== 'success') return null;
-      const { error: sessionError } = await supabase.auth.exchangeCodeForSession(result.url);
+      // 콜백 URL에서 code 파라미터만 추출한다. exchangeCodeForSession은 URL 전체가
+      // 아니라 auth code 문자열을 받는다.
+      const query = new URLSearchParams(result.url.split('?')[1] ?? '');
+      const errorDescription = query.get('error_description') ?? query.get('error');
+      if (errorDescription) return errorDescription;
+      const code = query.get('code');
+      if (!code) return '카카오 로그인 실패';
+      const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
       return sessionError?.message ?? null;
     } catch {
       return '카카오 로그인 중 오류가 발생했어요.';
