@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
@@ -48,3 +48,16 @@ export const supabase = createClient(
     },
   }
 );
+
+// React Native 권장 패턴: 앱이 포그라운드일 때만 토큰 자동 갱신 타이머를 돌린다.
+// OAuth 인앱 브라우저로 앱이 백그라운드에 다녀온 뒤 갱신 타이머와 auth 요청이
+// 엉켜 로그아웃 등 후속 요청이 멈추는 문제를 방지한다. (웹에서는 불필요)
+if (Platform.OS !== 'web') {
+  AppState.addEventListener('change', (state) => {
+    if (state === 'active') {
+      supabase.auth.startAutoRefresh();
+    } else {
+      supabase.auth.stopAutoRefresh();
+    }
+  });
+}
