@@ -33,5 +33,8 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: false,
+    // 네이티브 OAuth는 PKCE 필수 — 이게 없으면 signInWithOAuth가 code_verifier를 저장 안 해서
+    // exchangeCodeForSession이 "both auth code and code verifier should be non-empty"로 실패한다.
+    flowType: 'pkce',
   },
 });

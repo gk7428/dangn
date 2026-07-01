@@ -83,7 +83,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut(): Promise<void> {
-    await supabase.auth.signOut();
+    // scope:'local' — 서버 무효화(글로벌) 대신 로컬 세션만 지운다. OAuth 세션의
+    // refresh_token이 불안정해 글로벌 signOut이 실패해도 로그아웃이 항상 되도록.
+    try {
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch (_) {
+      // 무시 — 아래서 상태를 직접 비워 로그아웃 보장
+    }
+    setSession(null);
+    setProfile(null);
+    setAccount(null);
   }
 
   async function signInWithKakao(): Promise<string | null> {
