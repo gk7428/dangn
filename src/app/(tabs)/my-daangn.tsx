@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -19,9 +20,9 @@ const TRADE_MENU = ['판매내역', '구매내역', '관심목록', '나눔내�
 const ACTIVITY_MENU = ['동네생활 글', '동네생활 댓글'];
 const ETC_MENU = ['설정', '고객센터'];
 
-function MenuItem({ label }: { label: string }) {
+function MenuItem({ label, onPress }: { label: string; onPress?: () => void }) {
   return (
-    <TouchableOpacity style={styles.menuRow} activeOpacity={0.7}>
+    <TouchableOpacity style={styles.menuRow} activeOpacity={0.7} onPress={onPress}>
       <ThemedText style={styles.menuLabel}>{label}</ThemedText>
       <Ionicons name="chevron-forward" size={18} color={INK3} />
     </TouchableOpacity>
@@ -98,6 +99,14 @@ export default function MyBusanScreen() {
         <View style={styles.menuSection}>
           <ThemedText style={styles.sectionTitle}>나의 활동</ThemedText>
           {ACTIVITY_MENU.map((label) => <MenuItem key={label} label={label} />)}
+        </View>
+
+        <View style={styles.sectionDivider} />
+
+        {/* 결제 */}
+        <View style={styles.menuSection}>
+          <ThemedText style={styles.sectionTitle}>결제</ThemedText>
+          <MenuItem label="결제위젯 테스트" onPress={() => router.push('/checkout')} />
         </View>
 
         <View style={styles.sectionDivider} />
