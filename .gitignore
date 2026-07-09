@@ -49,3 +49,6 @@ app-example
 
 # Claude Code local session data
 .claude/
+
+# Supabase CLI local state
+supabase/.temp/

@@ -29,20 +29,48 @@ type Props = {
   customerId: string;
   customerEmail?: string;
   customerName?: string;
+  initialOrderName?: string;
+  initialAmount?: number;
+  lockAmount?: boolean;
 };
 
-export default function TossCheckoutWidget({ customerId, customerEmail, customerName }: Props) {
+export default function TossCheckoutWidget({
+  customerId,
+  customerEmail,
+  customerName,
+  initialOrderName,
+  initialAmount,
+  lockAmount,
+}: Props) {
   return (
     <PaymentWidgetProvider clientKey={TOSS_CLIENT_KEY} customerKey={customerId}>
-      <CheckoutContent customerEmail={customerEmail} customerName={customerName} />
+      <CheckoutContent
+        customerEmail={customerEmail}
+        customerName={customerName}
+        initialOrderName={initialOrderName}
+        initialAmount={initialAmount}
+        lockAmount={lockAmount}
+      />
     </PaymentWidgetProvider>
   );
 }
 
-function CheckoutContent({ customerEmail, customerName }: { customerEmail?: string; customerName?: string }) {
+function CheckoutContent({
+  customerEmail,
+  customerName,
+  initialOrderName,
+  initialAmount,
+  lockAmount,
+}: {
+  customerEmail?: string;
+  customerName?: string;
+  initialOrderName?: string;
+  initialAmount?: number;
+  lockAmount?: boolean;
+}) {
   const paymentWidgetControl = usePaymentWidget();
-  const [amountText, setAmountText] = useState('10000');
-  const [orderName, setOrderName] = useState('토스페이먼츠 테스트 상품');
+  const [amountText, setAmountText] = useState(String(initialAmount ?? 10000));
+  const [orderName, setOrderName] = useState(initialOrderName ?? '토스페이먼츠 테스트 상품');
   const [paymentMethodWidgetControl, setPaymentMethodWidgetControl] = useState<PaymentMethodWidgetControl | null>(null);
   const [agreementWidgetControl, setAgreementWidgetControl] = useState<AgreementWidgetControl | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -113,7 +141,8 @@ function CheckoutContent({ customerEmail, customerName }: { customerEmail?: stri
             <TextInput
               value={orderName}
               onChangeText={setOrderName}
-              style={styles.input}
+              editable={!lockAmount}
+              style={[styles.input, lockAmount && styles.inputLocked]}
               placeholder="주문명을 입력하세요"
               placeholderTextColor={INK2}
             />
@@ -126,8 +155,9 @@ function CheckoutContent({ customerEmail, customerName }: { customerEmail?: stri
                 value={amountText}
                 onChangeText={setAmountText}
                 onBlur={applyAmount}
+                editable={!lockAmount}
                 keyboardType="number-pad"
-                style={[styles.input, { flex: 1 }]}
+                style={[styles.input, { flex: 1 }, lockAmount && styles.inputLocked]}
                 placeholder="10000"
                 placeholderTextColor={INK2}
               />
@@ -188,6 +218,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 15,
     color: INK,
+  },
+  inputLocked: {
+    backgroundColor: '#F6F3EE',
+    color: INK2,
   },
   amountRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   won: { fontSize: 15, color: INK },

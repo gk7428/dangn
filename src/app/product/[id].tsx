@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { useProducts } from '@/context/products-context';
+import { parsePriceToNumber } from '@/data/products';
 
 const CORAL = '#FF5A4D';
 const INK = '#2A2723';
@@ -25,6 +26,16 @@ export default function ProductDetailScreen() {
       </SafeAreaView>
     );
   }
+
+  const priceValue = parsePriceToNumber(product.price);
+  const canBuy = priceValue > 0;
+
+  const buyNow = () => {
+    router.push({
+      pathname: '/checkout',
+      params: { orderName: product.title, amount: String(priceValue) },
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -78,6 +89,11 @@ export default function ProductDetailScreen() {
         <TouchableOpacity style={styles.chatButton} activeOpacity={0.8}>
           <ThemedText style={styles.chatButtonText}>채팅으로 거래하기</ThemedText>
         </TouchableOpacity>
+        {canBuy && (
+          <TouchableOpacity style={styles.buyButton} activeOpacity={0.8} onPress={buyNow}>
+            <ThemedText style={styles.buyButtonText}>바로 구매</ThemedText>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -189,12 +205,26 @@ const styles = StyleSheet.create({
   },
   chatButton: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: CORAL,
+  },
+  chatButtonText: {
+    color: CORAL,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  buyButton: {
+    flex: 1,
     backgroundColor: CORAL,
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
   },
-  chatButtonText: {
+  buyButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',

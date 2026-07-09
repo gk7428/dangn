@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -12,6 +12,9 @@ const LINE2 = '#E4DCD1';
 
 export default function CheckoutScreen() {
   const { session, profile, account } = useAuth();
+  const { orderName, amount } = useLocalSearchParams<{ orderName?: string; amount?: string }>();
+  const initialAmount = amount ? Number(amount) : undefined;
+  const isProductPurchase = !!initialAmount && initialAmount > 0;
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -19,7 +22,7 @@ export default function CheckoutScreen() {
         <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7} style={styles.backButton}>
           <Ionicons name="chevron-back" size={26} color={INK} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>결제위젯 테스트</ThemedText>
+        <ThemedText style={styles.headerTitle}>{isProductPurchase ? '결제하기' : '결제위젯 테스트'}</ThemedText>
         <View style={styles.backButton} />
       </View>
 
@@ -28,6 +31,9 @@ export default function CheckoutScreen() {
           customerId={account.id}
           customerEmail={session?.user?.email}
           customerName={profile?.nickname}
+          initialOrderName={orderName}
+          initialAmount={initialAmount}
+          lockAmount={isProductPurchase}
         />
       ) : (
         <View style={styles.loading}>
