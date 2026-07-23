@@ -33,6 +33,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [kakaoLoading, setKakaoLoading] = useState(false);
@@ -49,6 +50,7 @@ export default function LoginScreen() {
     setError('');
     setPassword('');
     setPasswordConfirm('');
+    setReferralCode('');
   };
 
   const canSubmit =
@@ -74,7 +76,7 @@ export default function LoginScreen() {
     const err =
       mode === 'login'
         ? await signIn(email.trim(), password)
-        : await signUp(email.trim(), password);
+        : await signUp(email.trim(), password, referralCode.trim() || undefined);
     setSubmitting(false);
     if (err) {
       setError(translateError(err));
@@ -148,6 +150,25 @@ export default function LoginScreen() {
                   value={passwordConfirm}
                   onChangeText={setPasswordConfirm}
                 />
+              </View>
+            )}
+
+            {mode === 'signup' && (
+              <View style={styles.inputGroup}>
+                <ThemedText style={styles.label}>추천 코드 (선택)</ThemedText>
+                <TextInput
+                  style={styles.input}
+                  placeholder="친구 추천 코드가 있다면 입력하세요"
+                  placeholderTextColor={INK3}
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                  value={referralCode}
+                  onChangeText={(t) => setReferralCode(t.toUpperCase())}
+                  maxLength={12}
+                />
+                <ThemedText style={styles.referralHint}>
+                  가입 시 입력하면 나와 친구 모두 1,000P를 받아요 🎁
+                </ThemedText>
               </View>
             )}
 
@@ -267,6 +288,7 @@ const styles = StyleSheet.create({
   },
   inputGroup: { gap: 6 },
   label: { fontSize: 13, fontWeight: '600', color: INK2 },
+  referralHint: { fontSize: 12, color: INK3, marginTop: 2 },
   input: {
     borderWidth: 1,
     borderColor: LINE2,

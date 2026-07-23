@@ -25,6 +25,9 @@ type Profile = {
   email: string;
   nickname: string;
   manner_temp: number;
+  points: number;
+  referral_code: string | null;
+  referred_by: string | null;
   created_at: string;
 };
 
@@ -42,9 +45,10 @@ type AuthContextValue = {
   account: Account | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<string | null>;
-  signUp: (email: string, password: string) => Promise<string | null>;
+  signUp: (email: string, password: string, referralCode?: string) => Promise<string | null>;
   signOut: () => Promise<void>;
   signInWithKakao: () => Promise<string | null>;
+  redeemReferral: (code: string) => Promise<string | null>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -101,9 +105,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return error?.message ?? null;
   }
 
-  async function signUp(email: string, password: string): Promise<string | null> {
-    const { error } = await supabase.auth.signUp({ email, password });
-    return error?.message ?? null;
+  async function signUp(email: string, password: string, referralCode?: string): Promise<string | null> {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) return error.message;
+
+    // 이메일 확인이 꺼져 있어 가입 즉시 세션이 생기면, 입력한 추천 코드를 바로 사용한다.
+    // (이메일 확인이 켜져 있어 세션이 없으면, 사용자는 나중에 "나의부산"에서 코드를 입력할 수 있다.)
+    if (data.session && referralCode?.trim()) {
+      // 가입 자체는 성공했으므로 추천 코드 처리 실패는 조용히 넘어간다(나의부산에서 재시도 가능).
+      await redeemReferral(referralCode).catch(() => {});
+    }
+    return null;
+  }
+
+  // 친구의 추천 코드를 사용해 양쪽에 1000포인트를 지급한다. 성공 시 null, 실패 시 에러 메시지 반환.
+  async function redeemReferral(code: string): Promise<string | null> {
+    const trimmed = code.trim();
+    if (!trimmed) return '추천 코드를 입력해주세요.';
+    const { data, error } = await supabase.rpc('redeem_referral', { p_code: trimmed });
+    if (error) return error.message;
+    const result = data as { success?: boolean; error?: string } | null;
+    if (!result?.success) return result?.error ?? '추천 코드 처리에 실패했어요.';
+    // 지급된 포인트를 즉시 반영하기 위해 프로필을 다시 불러온다.
+    const uid = session?.user?.id;
+    if (uid) await loadProfile(uid);
+    return null;
   }
 
   async function signOut(): Promise<void> {
@@ -147,7 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, profile, account, loading, signIn, signUp, signOut, signInWithKakao }}>
+    <AuthContext.Provider value={{ session, profile, account, loading, signIn, signUp, signOut, signInWithKakao, redeemReferral }}>
       {children}
     </AuthContext.Provider>
   );
